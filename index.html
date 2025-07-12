@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Matchmaker 💕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .user-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .user-card:hover::before {
+            left: 100%;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .girl {
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+        }
+
+        .boy {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .user-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .user-type {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .match-section {
+            text-align: center;
+            margin: 40px 0;
+            animation: fadeIn 1s ease-out 0.6s both;
+        }
+
+        .match-button {
+            background: linear-gradient(135deg, #ff6b9d, #4facfe);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .match-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .match-button:active {
+            transform: translateY(0);
+        }
+
+        .match-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            margin-top: 40px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.5s ease;
+        }
+
+        .results.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .match-pair {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .match-person {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .match-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .heart {
+            font-size: 2rem;
+            color: #ff6b9d;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        .no-matches {
+            text-align: center;
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-top: 20px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .matching {
+            animation: pulse 0.5s ease-in-out infinite;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .users-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+            }
+            
+            .user-card {
+                padding: 20px 15px;
+            }
+            
+            .match-pair {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .match-person {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .users-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            
+            .user-card {
+                padding: 15px 10px;
+            }
+            
+            .user-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+            
+            .match-button {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💕 Vibe Matchmaker</h1>
+            <p>Let the universe decide your perfect match!</p>
+        </div>
+
+        <div class="users-grid" id="usersGrid">
+            <!-- Users will be populated by JavaScript -->
+        </div>
+
+        <div class="match-section">
+            <button class="match-button" id="matchButton" onclick="findMatches()">
+                ✨ Find My Matches ✨
+            </button>
+        </div>
+
+        <div class="results" id="results">
+            <!-- Match results will appear here -->
+        </div>
+    </div>
+
+    <script>
+        const users = [
+            { name: 'Vuyo', type: 'girl', avatar: '👸' },
+            { name: 'Ntando', type: 'girl', avatar: '🌸' },
+            { name: 'Tsehgo', type: 'girl', avatar: '💎' },
+            { name: 'Faithful', type: 'boy', avatar: '👑' },
+            { name: 'Nkati', type: 'boy', avatar: '⭐' },
+            { name: 'Khanyo', type: 'boy', avatar: '🔥' },
+            { name: 'Tawanda', type: 'boy', avatar: '💫' }
+        ];
+
+        function initializeUsers() {
+            const usersGrid = document.getElementById('usersGrid');
+            usersGrid.innerHTML = '';
+
+            users.forEach(user => {
+                const userCard = document.createElement('div');
+                userCard.className = 'user-card';
+                userCard.innerHTML = `
+                    <div class="user-avatar ${user.type}">
+                        ${user.avatar}
+                    </div>
+                    <div class="user-name">${user.name}</div>
+                    <div class="user-type">${user.type}</div>
+                `;
+                usersGrid.appendChild(userCard);
+            });
+        }
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function findMatches() {
+            const matchButton = document.getElementById('matchButton');
+            const results = document.getElementById('results');
+            
+            // Add loading state
+            matchButton.disabled = true;
+            matchButton.textContent = '🔮 Finding Matches...';
+            matchButton.classList.add('matching');
+            
+            // Hide previous results
+            results.classList.remove('show');
+            
+            setTimeout(() => {
+                const girls = users.filter(user => user.type === 'girl');
+                const boys = users.filter(user => user.type === 'boy');
+                
+                // Shuffle both arrays
+                const shuffledGirls = shuffleArray(girls);
+                const shuffledBoys = shuffleArray(boys);
+                
+                // Create matches (minimum of girls and boys count)
+                const matchCount = Math.min(shuffledGirls.length, shuffledBoys.length);
+                const matches = [];
+                
+                for (let i = 0; i < matchCount; i++) {
+                    matches.push({
+                        girl: shuffledGirls[i],
+                        boy: shuffledBoys[i]
+                    });
+                }
+                
+                displayMatches(matches);
+                
+                // Reset button
+                matchButton.disabled = false;
+                matchButton.textContent = '✨ Find New Matches ✨';
+                matchButton.classList.remove('matching');
+            }, 2000);
+        }
+
+        function displayMatches(matches) {
+            const results = document.getElementById('results');
+            
+            if (matches.length === 0) {
+                results.innerHTML = `
+                    <div class="no-matches">
+                        <h3>No matches found this time! 🤷‍♀️</h3>
+                        <p>Try again for different combinations!</p>
+                    </div>
+                `;
+            } else {
+                let matchesHTML = '<h2 style="text-align: center; margin-bottom: 30px; font-size: 2rem;">💕 Your Matches 💕</h2>';
+                
+                matches.forEach((match, index) => {
+                    matchesHTML += `
+                        <div class="match-pair" style="animation-delay: ${index * 0.2}s">
+                            <div class="match-person">
+                                <div class="match-avatar girl">${match.girl.avatar}</div>
+                                <div>
+                                    <div style="font-weight: bold; font-size: 1.1rem;">${match.girl.name}</div>
+                                    <div style="opacity: 0.8; font-size: 0.9rem;">Princess</div>
+                                </div>
+                            </div>
+                            <div class="heart">💖</div>
+                            <div class="match-person">
+                                <div class="match-avatar boy">${match.boy.avatar}</div>
+                                <div>
+                                    <div style="font-weight: bold; font-size: 1.1rem;">${match.boy.name}</div>
+                                    <div style="opacity: 0.8; font-size: 0.9rem;">Prince</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                results.innerHTML = matchesHTML;
+            }
+            
+            // Show results with animation
+            setTimeout(() => {
+                results.classList.add('show');
+            }, 100);
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeUsers();
+        });
+
+        // Add some fun interactions
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.user-card')) {
+                const card = e.target.closest('.user-card');
+                card.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    card.style.transform = '';
+                }, 150);
+            }
+        });
+
+        // Add floating hearts animation
+        function createFloatingHeart() {
+            const heart = document.createElement('div');
+            heart.innerHTML = '💖';
+            heart.style.position = 'fixed';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.top = '100vh';
+            heart.style.fontSize = '2rem';
+            heart.style.pointerEvents = 'none';
+            heart.style.zIndex = '1000';
+            heart.style.animation = 'floatUp 4s ease-out forwards';
+            
+            document.body.appendChild(heart);
+            
+            setTimeout(() => {
+                heart.remove();
+            }, 4000);
+        }
+
+        // Add CSS for floating hearts
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes floatUp {
+                0% {
+                    transform: translateY(0) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(-100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Trigger floating hearts occasionally
+        setInterval(() => {
+            if (Math.random() < 0.3) {
+                createFloatingHeart();
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
